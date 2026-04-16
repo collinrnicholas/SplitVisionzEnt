@@ -1,22 +1,23 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 
 const photos = [
-  { src: '/images/portfolio/DSC03411.jpg', tag: 'Piece · 01', name: 'DSC03411' },
-  { src: '/images/portfolio/IMG_4496.jpg', tag: 'Piece · 02', name: 'IMG 4496' },
-  { src: '/images/portfolio/IMG_4957.jpg', tag: 'Piece · 03', name: 'IMG 4957' },
-  { src: '/images/portfolio/IMG_5231.jpg', tag: 'Piece · 04', name: 'IMG 5231' },
-  { src: '/images/portfolio/IMG_5333.jpg', tag: 'Piece · 05', name: 'IMG 5333' },
-  { src: '/images/portfolio/IMG_6086.jpg', tag: 'Piece · 06', name: 'IMG 6086' },
+  { src: '/images/portfolio/DSC03411.jpg', label: 'No. 01' },
+  { src: '/images/portfolio/IMG_4496.jpg', label: 'No. 02' },
+  { src: '/images/portfolio/IMG_4957.jpg', label: 'No. 03' },
+  { src: '/images/portfolio/IMG_5231.jpg', label: 'No. 04' },
+  { src: '/images/portfolio/IMG_5333.jpg', label: 'No. 05' },
+  { src: '/images/portfolio/IMG_6086.jpg', label: 'No. 06' },
 ]
 
 export default function Portfolio() {
   const [headerRef, headerVisible] = useReveal()
   const trackRef = useRef<HTMLDivElement>(null)
   const [arrowHover, setArrowHover] = useState<'left' | 'right' | null>(null)
+  const pausedRef = useRef(false)
 
   const scroll = useCallback((dir: 1 | -1) => {
     const track = trackRef.current
@@ -25,11 +26,53 @@ export default function Portfolio() {
     track.scrollBy({ left: dir * (cardWidth + 20), behavior: 'smooth' })
   }, [])
 
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const speed = isMobile ? 0.018 : 0.033
+
+    let raf: number
+    let last = 0
+
+    function step(time: number) {
+      if (last && !pausedRef.current) {
+        const delta = time - last
+        track!.scrollLeft += delta * speed
+        if (track!.scrollLeft >= track!.scrollWidth - track!.clientWidth) {
+          track!.scrollLeft = 0
+        }
+      }
+      last = time
+      raf = requestAnimationFrame(step)
+    }
+
+    raf = requestAnimationFrame(step)
+
+    const pause = () => { pausedRef.current = true }
+    const resume = () => { pausedRef.current = false; last = 0 }
+
+    track.addEventListener('mouseenter', pause)
+    track.addEventListener('mouseleave', resume)
+    track.addEventListener('touchstart', pause, { passive: true })
+    track.addEventListener('touchend', resume)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      track.removeEventListener('mouseenter', pause)
+      track.removeEventListener('mouseleave', resume)
+      track.removeEventListener('touchstart', pause)
+      track.removeEventListener('touchend', resume)
+    }
+  }, [])
+
   return (
-    <section id="portfolio" style={{ padding: '10rem 0', position: 'relative' }}>
-      <div style={{ padding: '0 3rem', marginBottom: '4rem' }}>
+    <section id="portfolio" className="portfolio-section" style={{ position: 'relative' }}>
+      <div style={{ padding: '0 var(--pad)', marginBottom: '3rem' }}>
         <div
           ref={headerRef}
+          className="portfolio-header"
           style={{
             opacity: headerVisible ? 1 : 0,
             transform: headerVisible ? 'translateY(0)' : 'translateY(30px)',
@@ -46,19 +89,19 @@ export default function Portfolio() {
               letterSpacing: '0.25em',
               color: 'var(--gold)',
               textTransform: 'uppercase',
-              marginBottom: '1.5rem',
+              marginBottom: '1rem',
             }}>Selected Work</div>
             <h2 style={{
               fontFamily: "'Bebas Neue', cursive",
-              fontSize: 'clamp(3rem, 6vw, 5.5rem)',
+              fontSize: 'clamp(2.5rem, 6vw, 5.5rem)',
               letterSpacing: '0.04em',
               color: 'var(--bone)',
               lineHeight: 0.9,
             }}>PORTFOLIO</h2>
           </div>
 
-          {/* Arrow controls */}
-          <div style={{ display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem' }}>
+          {/* Arrow controls — desktop only */}
+          <div className="portfolio-arrows" style={{ display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem' }}>
             {(['left', 'right'] as const).map(dir => (
               <button
                 key={dir}
@@ -94,11 +137,8 @@ export default function Portfolio() {
         className="portfolio-track"
         style={{
           display: 'flex',
-          gap: '20px',
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
-          paddingLeft: '3rem',
-          paddingRight: '3rem',
           paddingBottom: '1rem',
         }}
       >
@@ -108,30 +148,51 @@ export default function Portfolio() {
       </div>
 
       {/* Edge fades */}
-      <div style={{
+      <div className="portfolio-fade-left" style={{
         position: 'absolute',
         top: 0, left: 0, bottom: 0,
-        width: '3rem',
         background: 'linear-gradient(to right, var(--ink), transparent)',
         pointerEvents: 'none',
         zIndex: 2,
       }} />
-      <div style={{
+      <div className="portfolio-fade-right" style={{
         position: 'absolute',
         top: 0, right: 0, bottom: 0,
-        width: '3rem',
         background: 'linear-gradient(to left, var(--ink), transparent)',
         pointerEvents: 'none',
         zIndex: 2,
       }} />
 
       <style>{`
+        .portfolio-section {
+          padding: 4rem 0;
+        }
         .portfolio-track {
+          gap: 12px;
+          padding-left: var(--pad);
+          padding-right: var(--pad);
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
-        .portfolio-track::-webkit-scrollbar {
-          display: none;
+        .portfolio-track::-webkit-scrollbar { display: none; }
+        .portfolio-fade-left,
+        .portfolio-fade-right { width: var(--pad); }
+
+        .portfolio-card {
+          min-width: 85vw;
+          height: 420px;
+        }
+
+        @media (min-width: 768px) {
+          .portfolio-section { padding: 10rem 0; }
+          .portfolio-track { gap: 20px; }
+          .portfolio-card {
+            min-width: calc((100vw - 6rem - 40px) / 2.5);
+            height: 500px;
+          }
+        }
+        @media (max-width: 767px) {
+          .portfolio-arrows { display: none !important; }
         }
       `}</style>
     </section>
@@ -151,8 +212,6 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
       onMouseLeave={() => setHovered(false)}
       style={{
         position: 'relative',
-        height: '500px',
-        minWidth: 'calc((100vw - 6rem - 40px) / 2.5)',
         flexShrink: 0,
         overflow: 'hidden',
         background: 'var(--dim)',
@@ -166,9 +225,9 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
       {!errored ? (
         <Image
           src={photo.src}
-          alt={photo.name}
+          alt={photo.label}
           fill
-          sizes="40vw"
+          sizes="(max-width: 767px) 85vw, 40vw"
           onError={() => setErrored(true)}
           style={{
             objectFit: 'cover',
@@ -203,30 +262,21 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
         pointerEvents: 'none',
       }} />
 
-      {/* Caption overlay */}
+      {/* Caption — subtle, bottom-pinned */}
       <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(10,9,8,0.9) 0%, rgba(10,9,8,0.3) 30%, transparent 55%)',
-        opacity: hovered ? 1 : 0,
-        transition: 'opacity 0.5s ease',
-        display: 'flex', flexDirection: 'column',
-        justifyContent: 'flex-end', padding: '2rem',
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        padding: '0.75rem 1rem',
+        opacity: 0.5,
         pointerEvents: 'none',
       }}>
         <div style={{
           fontFamily: "'Space Mono', monospace",
-          fontSize: '0.55rem',
+          fontSize: '0.5rem',
           letterSpacing: '0.2em',
-          color: 'var(--gold)',
+          color: 'var(--gold-dim)',
           textTransform: 'uppercase',
-          marginBottom: '0.4rem',
-        }}>{photo.tag}</div>
-        <div style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: '1.2rem',
-          fontStyle: 'italic',
-          color: 'var(--bone)',
-        }}>{photo.name}</div>
+        }}>{photo.label}</div>
       </div>
     </div>
   )

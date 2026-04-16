@@ -30,7 +30,7 @@ export default function Process() {
 
   return (
     <section id="process" style={{ background: 'var(--dim)' }}>
-      <div style={{ padding: '10rem 3rem 0' }}>
+      <div className="process-header">
         <div
           ref={headerRef}
           style={{
@@ -40,23 +40,46 @@ export default function Process() {
           }}>
           <h2 style={{
             fontFamily: "'Bebas Neue', cursive",
-            fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+            fontSize: 'clamp(2rem, 5vw, 4.5rem)',
             letterSpacing: '0.06em',
             color: 'var(--bone)',
           }}>THE PROCESS</h2>
         </div>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        borderLeft: '0.5px solid var(--mid)',
-        marginTop: '5rem',
-      }}>
+      <div className="process-grid">
         {steps.map((step, i) => (
           <ProcessStep key={step.title} step={step} delay={i * 0.15} />
         ))}
       </div>
+
+      <style>{`
+        .process-header {
+          padding: 4rem var(--pad) 0;
+        }
+        .process-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          margin-top: 2.5rem;
+        }
+        .process-step {
+          padding: 2rem var(--pad);
+          border-bottom: 0.5px solid var(--mid);
+        }
+        @media (min-width: 768px) {
+          .process-header { padding-top: 10rem; }
+          .process-grid {
+            grid-template-columns: repeat(4, 1fr);
+            border-left: 0.5px solid var(--mid);
+            margin-top: 5rem;
+          }
+          .process-step {
+            padding: 3rem 2.5rem;
+            border-bottom: none;
+            border-right: 0.5px solid var(--mid);
+          }
+        }
+      `}</style>
     </section>
   )
 }
@@ -67,9 +90,8 @@ function ProcessStep({ step, delay }: { step: typeof steps[0], delay: number }) 
   return (
     <div
       ref={ref}
+      className="process-step"
       style={{
-        padding: '3rem 2.5rem',
-        borderRight: '0.5px solid var(--mid)',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(30px)',
         transition: `opacity 0.9s ease ${delay}s, transform 0.9s ease ${delay}s`,
@@ -79,7 +101,7 @@ function ProcessStep({ step, delay }: { step: typeof steps[0], delay: number }) 
         fontSize: '0.6rem',
         color: 'var(--gold)',
         letterSpacing: '0.15em',
-        marginBottom: '2rem',
+        marginBottom: '1.5rem',
       }}>{step.num}</div>
       <div style={{
         fontFamily: "'Bebas Neue', cursive",

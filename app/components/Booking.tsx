@@ -14,6 +14,7 @@ const inputStyle: React.CSSProperties = {
   fontStyle: 'italic',
   color: 'var(--bone)',
   outline: 'none',
+  borderRadius: 0,
 }
 
 const labelStyle: React.CSSProperties = {
@@ -46,23 +47,15 @@ export default function Booking() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // Wire to your Railway API endpoint when ready
-    // await fetch('/api/inquire', { method: 'POST', body: new FormData(e.currentTarget) })
     setSubmitted(true)
   }
 
   return (
-    <section id="booking" style={{
-      padding: '10rem 3rem',
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '8rem',
-      alignItems: 'start',
-    }}>
+    <section id="booking" className="booking-section">
       <div ref={ref1} style={revealStyle(visible1)}>
         <h2 style={{
           fontFamily: "'Bebas Neue', cursive",
-          fontSize: 'clamp(3.5rem, 7vw, 6rem)',
+          fontSize: 'clamp(2.5rem, 7vw, 6rem)',
           lineHeight: 0.88,
           letterSpacing: '0.04em',
           color: 'var(--bone)',
@@ -75,14 +68,14 @@ export default function Booking() {
           fontStyle: 'italic',
           color: 'var(--ash)',
           lineHeight: 1.75,
-          marginBottom: '3rem',
+          marginBottom: '2.5rem',
         }}>
           We are currently accepting inquiries for the <em>spring cohort</em>. Commissions are limited. If the work resonates, write to us below.
         </p>
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', marginBottom: '2.5rem' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', marginBottom: '2rem' }} />
         <p style={{
           fontFamily: "'Space Mono', monospace",
-          fontSize: '0.58rem',
+          fontSize: '0.55rem',
           letterSpacing: '0.15em',
           color: 'var(--mid)',
           textTransform: 'uppercase',
@@ -159,6 +152,23 @@ export default function Booking() {
           </form>
         )}
       </div>
+
+      <style>{`
+        .booking-section {
+          padding: 4rem var(--pad);
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 3rem;
+          align-items: start;
+        }
+        @media (min-width: 768px) {
+          .booking-section {
+            padding: 10rem var(--pad);
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+          }
+        }
+      `}</style>
     </section>
   )
 }
@@ -168,9 +178,10 @@ function SubmitButton() {
   return (
     <button
       type="submit"
+      className="booking-submit"
       style={{
-        marginTop: '2.5rem',
-        display: 'inline-flex', alignItems: 'center', gap: '1.5rem',
+        marginTop: '2rem',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem',
         background: hovered ? 'rgba(201,168,76,0.08)' : 'none',
         border: `0.5px solid ${hovered ? 'var(--gold)' : 'rgba(240,235,227,0.25)'}`,
         padding: '1rem 2.5rem',
@@ -181,6 +192,7 @@ function SubmitButton() {
         color: 'var(--bone)',
         cursor: 'crosshair',
         transition: 'background 0.3s, border-color 0.3s',
+        width: '100%',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

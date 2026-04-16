@@ -13,13 +13,7 @@ export default function Manifesto() {
   })
 
   return (
-    <section id="manifesto" style={{
-      padding: '10rem 3rem',
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '6rem',
-      alignItems: 'center',
-    }}>
+    <section id="manifesto" className="manifesto-section">
       <div ref={ref1} style={revealStyle(visible1)}>
         <div style={{
           fontFamily: "'Space Mono', monospace",
@@ -32,7 +26,7 @@ export default function Manifesto() {
 
         <h2 style={{
           fontFamily: "'Bebas Neue', cursive",
-          fontSize: 'clamp(3rem, 6vw, 5.5rem)',
+          fontSize: 'clamp(2.5rem, 6vw, 5.5rem)',
           lineHeight: 0.9,
           letterSpacing: '0.04em',
           color: 'var(--bone)',
@@ -40,9 +34,9 @@ export default function Manifesto() {
           ONE<br/>ARTIST.<br/>ONE<br/>CLIENT.
         </h2>
 
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2.5rem 0' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2rem 0' }} />
 
-        <div style={{ display: 'flex', gap: '3rem' }}>
+        <div className="manifesto-stats">
           {[
             { num: '100+', label: 'Clients per year' },
             { num: '18+', label: 'Years mastery' },
@@ -51,13 +45,13 @@ export default function Manifesto() {
             <div key={label}>
               <div style={{
                 fontFamily: "'Bebas Neue', cursive",
-                fontSize: '3rem',
+                fontSize: 'clamp(2rem, 5vw, 3rem)',
                 color: 'var(--bone)',
                 lineHeight: 1,
               }}>{num}</div>
               <div style={{
                 fontFamily: "'Space Mono', monospace",
-                fontSize: '0.55rem',
+                fontSize: '0.5rem',
                 letterSpacing: '0.2em',
                 color: 'var(--ash)',
                 textTransform: 'uppercase',
@@ -81,7 +75,7 @@ export default function Manifesto() {
           We accept <strong style={{ color: 'var(--bone)', fontStyle: 'normal', fontWeight: 400 }}>twelve commissions per year</strong>. If you are reading this, a space may be open.
         </p>
 
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2.5rem 0' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2rem 0' }} />
 
         <a href="#process" style={{
           fontFamily: "'Space Mono', monospace",
@@ -98,6 +92,31 @@ export default function Manifesto() {
           onMouseLeave={e => (e.currentTarget.style.color = 'var(--ash)')}
         >How it works →</a>
       </div>
+
+      <style>{`
+        .manifesto-section {
+          padding: 4rem var(--pad);
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 3rem;
+          align-items: center;
+        }
+        .manifesto-stats {
+          display: flex;
+          gap: 2rem;
+          flex-wrap: wrap;
+        }
+        @media (min-width: 768px) {
+          .manifesto-section {
+            padding: 10rem var(--pad);
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+          }
+          .manifesto-stats {
+            gap: 3rem;
+          }
+        }
+      `}</style>
     </section>
   )
 }

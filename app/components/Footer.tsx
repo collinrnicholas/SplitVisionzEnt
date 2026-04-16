@@ -2,13 +2,7 @@
 
 export default function Footer() {
   return (
-    <footer style={{
-      padding: '4rem 3rem',
-      borderTop: '0.5px solid var(--dim)',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    }}>
+    <footer className="site-footer">
       <div style={{
         fontFamily: "'Bebas Neue', cursive",
         fontSize: '1.5rem',
@@ -16,9 +10,15 @@ export default function Footer() {
         color: 'var(--mid)',
       }}>SPLIT VISIONZ</div>
 
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        {['Instagram', 'Process', 'Contact'].map(label => (
-          <a key={label} href="#" style={{
+      <div className="footer-links">
+        {[
+          { label: 'Instagram', href: 'https://www.instagram.com/sv_ink', external: true },
+          { label: 'Process', href: '#process', external: false },
+          { label: 'Contact', href: '#booking', external: false },
+        ].map(({ label, href, external }) => (
+          <a key={label} href={href}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            style={{
             fontFamily: "'Space Mono', monospace",
             fontSize: '0.55rem',
             letterSpacing: '0.15em',
@@ -35,10 +35,36 @@ export default function Footer() {
 
       <div style={{
         fontFamily: "'Space Mono', monospace",
-        fontSize: '0.55rem',
+        fontSize: '0.5rem',
         letterSpacing: '0.15em',
         color: 'var(--mid)',
-      }}>© 2025 Split Visionz Studio · All rights reserved</div>
+      }}>&copy; 2026 Split Visionz &middot; All rights reserved</div>
+
+      <style>{`
+        .site-footer {
+          padding: 3rem var(--pad);
+          border-top: 0.5px solid var(--dim);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1.5rem;
+          text-align: center;
+        }
+        .footer-links {
+          display: flex;
+          gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+          .site-footer {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            padding: 4rem var(--pad);
+          }
+          .footer-links { gap: 2rem; }
+        }
+      `}</style>
     </footer>
   )
 }
