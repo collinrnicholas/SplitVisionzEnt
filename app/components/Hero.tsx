@@ -65,7 +65,7 @@ export default function Hero() {
       {/* SV monogram — image with graceful text fallback */}
       <div className="hero-animate" style={{
         position: 'absolute', top: '6rem', right: '3rem',
-        width: '120px', height: '120px',
+        width: '380px', height: '480px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         pointerEvents: 'none',
       }}>
@@ -73,8 +73,8 @@ export default function Hero() {
           <Image
             src="/images/sv-logo.png"
             alt="SV monogram"
-            width={120}
-            height={120}
+            width={380}
+            height={480}
             onError={() => setLogoError(true)}
             style={{ objectFit: 'contain', opacity: 0.85 }}
           />
@@ -110,7 +110,7 @@ export default function Hero() {
 
       <h1 className="hero-animate" style={{
         fontFamily: "'Bebas Neue', cursive",
-        fontSize: 'clamp(5rem, 14vw, 13rem)',
+        fontSize: 'clamp(1.8rem, 3.5vw, 3.2rem)',
         lineHeight: 0.88,
         letterSpacing: '0.02em',
         color: 'var(--bone)',

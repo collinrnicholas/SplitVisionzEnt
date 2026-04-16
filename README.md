@@ -33,19 +33,27 @@ Set `NEXT_PUBLIC_API_URL` in Vercel environment variables.
 
 ## Adding portfolio photos
 
-Portfolio images live in `public/images/portfolio/`. The grid expects six files named exactly:
+Portfolio images live in `public/images/portfolio/`. The grid expects these six JPG files:
 
 ```
-public/images/portfolio/photo1.jpg
-public/images/portfolio/photo2.jpg
-public/images/portfolio/photo3.jpg
-public/images/portfolio/photo4.jpg
-public/images/portfolio/photo5.jpg
-public/images/portfolio/photo6.jpg
+public/images/portfolio/DSC03411.jpg
+public/images/portfolio/IMG_4496.jpg
+public/images/portfolio/IMG_4957.jpg
+public/images/portfolio/IMG_5231.jpg
+public/images/portfolio/IMG_5333.jpg
+public/images/portfolio/IMG_6086.jpg
 ```
+
+**If you have HEIC files** (e.g. from iPhone), drop them into the folder and run:
+
+```bash
+./scripts/convert-images.sh
+```
+
+This uses macOS `sips` to convert all `.heic` files to `.jpg` (quality 85) and deletes the originals.
 
 To update the portfolio:
-1. Save your JPG files into `public/images/portfolio/` with the names above.
+1. Add or replace JPG files in `public/images/portfolio/` with the names above.
 2. Commit and push to GitHub — Vercel will auto-deploy.
 
 Any missing file falls back to a dark placeholder with a gold border, so the layout won't break. The SV monogram at `public/images/sv-logo.png` behaves the same way — if it's absent, an ornate gold "SV" text monogram renders instead.

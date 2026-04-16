@@ -44,7 +44,7 @@ export default function Manifesto() {
 
         <div style={{ display: 'flex', gap: '3rem' }}>
           {[
-            { num: '12', label: 'Clients per year' },
+            { num: '100+', label: 'Clients per year' },
             { num: '18+', label: 'Years mastery' },
             { num: '∞', label: 'Hours per piece' },
           ].map(({ num, label }) => (
