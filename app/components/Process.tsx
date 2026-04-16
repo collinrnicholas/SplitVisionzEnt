@@ -77,7 +77,7 @@ function ProcessStep({ step, delay }: { step: typeof steps[0], delay: number }) 
       <div style={{
         fontFamily: "'Space Mono', monospace",
         fontSize: '0.6rem',
-        color: 'var(--ember)',
+        color: 'var(--gold)',
         letterSpacing: '0.15em',
         marginBottom: '2rem',
       }}>{step.num}</div>

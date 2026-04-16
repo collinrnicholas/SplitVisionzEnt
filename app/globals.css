@@ -8,7 +8,9 @@
   --ink: #0a0908;
   --bone: #f0ebe3;
   --ash: #c8c0b4;
-  --ember: #c94f2a;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-dim: #7a6328;
   --dim: #1e1c1a;
   --mid: #3a3632;
 }
@@ -24,7 +26,7 @@ body {
 }
 
 ::selection {
-  background: var(--ember);
+  background: var(--gold);
   color: var(--bone);
 }
 

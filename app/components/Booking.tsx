@@ -40,7 +40,7 @@ export default function Booking() {
 
   const focusedInputStyle = (name: string): React.CSSProperties => ({
     ...inputStyle,
-    borderBottomColor: focused === name ? 'var(--ember)' : 'var(--mid)',
+    borderBottomColor: focused === name ? 'var(--gold)' : 'var(--mid)',
     transition: 'border-color 0.3s',
   })
 
@@ -79,7 +79,7 @@ export default function Booking() {
         }}>
           We are currently accepting inquiries for the <em>spring cohort</em>. Commissions are limited. If the work resonates, write to us below.
         </p>
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--ember)', marginBottom: '2.5rem' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', marginBottom: '2.5rem' }} />
         <p style={{
           fontFamily: "'Space Mono', monospace",
           fontSize: '0.58rem',
@@ -88,7 +88,7 @@ export default function Booking() {
           textTransform: 'uppercase',
           lineHeight: 2,
         }}>
-          studio@veiltattoostudio.com<br/><br/>
+          studio@splitvisionz.com<br/><br/>
           By appointment only<br/>
           Location disclosed upon acceptance
         </p>
@@ -97,7 +97,7 @@ export default function Booking() {
       <div ref={ref2} style={revealStyle(visible2, 0.2)}>
         {submitted ? (
           <div style={{ paddingTop: '2rem' }}>
-            <div style={{ width: '40px', height: '0.5px', background: 'var(--ember)', marginBottom: '2rem' }} />
+            <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', marginBottom: '2rem' }} />
             <p style={{ fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--ash)', lineHeight: 1.8 }}>
               Your inquiry has been received.<br/>
               We will be in touch if your vision aligns with our current work.
@@ -171,8 +171,8 @@ function SubmitButton() {
       style={{
         marginTop: '2.5rem',
         display: 'inline-flex', alignItems: 'center', gap: '1.5rem',
-        background: hovered ? 'rgba(201,79,42,0.08)' : 'none',
-        border: `0.5px solid ${hovered ? 'var(--ember)' : 'rgba(240,235,227,0.25)'}`,
+        background: hovered ? 'rgba(201,168,76,0.08)' : 'none',
+        border: `0.5px solid ${hovered ? 'var(--gold)' : 'rgba(240,235,227,0.25)'}`,
         padding: '1rem 2.5rem',
         fontFamily: "'Space Mono', monospace",
         fontSize: '0.65rem',
@@ -185,7 +185,7 @@ function SubmitButton() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      Submit inquiry <span style={{ color: 'var(--ember)' }}>→</span>
+      Submit inquiry <span style={{ color: 'var(--gold)' }}>→</span>
     </button>
   )
 }

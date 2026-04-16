@@ -14,7 +14,7 @@ export default function Nav() {
         letterSpacing: '0.18em',
         color: 'var(--bone)',
         textDecoration: 'none',
-      }}>VEIL</a>
+      }}>SPLIT VISIONZ</a>
 
       <ul style={{ display: 'flex', gap: '2.5rem', listStyle: 'none' }}>
         {[

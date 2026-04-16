@@ -1,4 +1,4 @@
-# VEIL — Private Tattoo Studio
+# Split Visionz — Private Tattoo Studio
 
 Next.js 16 · TypeScript · Tailwind · App Router
 

@@ -25,7 +25,7 @@ export default function Manifesto() {
           fontFamily: "'Space Mono', monospace",
           fontSize: '0.6rem',
           letterSpacing: '0.25em',
-          color: 'var(--ember)',
+          color: 'var(--gold)',
           textTransform: 'uppercase',
           marginBottom: '2rem',
         }}>The Philosophy</div>
@@ -40,7 +40,7 @@ export default function Manifesto() {
           ONE<br/>ARTIST.<br/>ONE<br/>CLIENT.
         </h2>
 
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--ember)', margin: '2.5rem 0' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2.5rem 0' }} />
 
         <div style={{ display: 'flex', gap: '3rem' }}>
           {[
@@ -74,14 +74,14 @@ export default function Manifesto() {
         </p>
         <br/>
         <p style={{ fontSize: '1.05rem', fontStyle: 'italic', lineHeight: 1.85, color: 'var(--ash)' }}>
-          <strong style={{ color: 'var(--bone)', fontStyle: 'normal', fontWeight: 400 }}>VEIL</strong> is a private atelier — a single room, a single artist, and a practice that treats the body as the only canvas that matters. Every piece begins with conversation, moves through weeks of design, and ends with something that could only ever be yours.
+          <strong style={{ color: 'var(--bone)', fontStyle: 'normal', fontWeight: 400 }}>Split Visionz</strong> is a private atelier — a single room, a single artist, and a practice that treats the body as the only canvas that matters. Every piece begins with conversation, moves through weeks of design, and ends with something that could only ever be yours.
         </p>
         <br/>
         <p style={{ fontSize: '1.05rem', fontStyle: 'italic', lineHeight: 1.85, color: 'var(--ash)' }}>
           We accept <strong style={{ color: 'var(--bone)', fontStyle: 'normal', fontWeight: 400 }}>twelve commissions per year</strong>. If you are reading this, a space may be open.
         </p>
 
-        <div style={{ width: '40px', height: '0.5px', background: 'var(--ember)', margin: '2.5rem 0' }} />
+        <div style={{ width: '40px', height: '0.5px', background: 'var(--gold)', margin: '2.5rem 0' }} />
 
         <a href="#process" style={{
           fontFamily: "'Space Mono', monospace",

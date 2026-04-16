@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
+  const [logoError, setLogoError] = useState(false)
 
   useEffect(() => {
     const els = heroRef.current?.querySelectorAll('.hero-animate')
@@ -32,8 +34,8 @@ export default function Hero() {
       <div style={{
         position: 'absolute', inset: 0,
         background: `
-          radial-gradient(ellipse 60% 80% at 70% 40%, rgba(201,79,42,0.07) 0%, transparent 60%),
-          radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,79,42,0.04) 0%, transparent 50%)
+          radial-gradient(ellipse 60% 80% at 70% 40%, rgba(201,168,76,0.07) 0%, transparent 60%),
+          radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%)
         `,
       }} />
 
@@ -60,12 +62,46 @@ export default function Hero() {
         </g>
       </svg>
 
+      {/* SV monogram — image with graceful text fallback */}
+      <div className="hero-animate" style={{
+        position: 'absolute', top: '6rem', right: '3rem',
+        width: '120px', height: '120px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        pointerEvents: 'none',
+      }}>
+        {!logoError ? (
+          <Image
+            src="/images/sv-logo.png"
+            alt="SV monogram"
+            width={120}
+            height={120}
+            onError={() => setLogoError(true)}
+            style={{ objectFit: 'contain', opacity: 0.85 }}
+          />
+        ) : (
+          <span aria-label="SV monogram" style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontStyle: 'italic',
+            fontWeight: 600,
+            fontSize: '5.5rem',
+            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            color: 'var(--gold)',
+            textShadow: '0 0 24px rgba(201,168,76,0.25)',
+            background: 'linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 55%, var(--gold-dim) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>SV</span>
+        )}
+      </div>
+
       {/* Content */}
       <div className="hero-animate" style={{
         fontFamily: "'Space Mono', monospace",
         fontSize: '0.65rem',
         letterSpacing: '0.3em',
-        color: 'var(--ember)',
+        color: 'var(--gold)',
         textTransform: 'uppercase',
         marginBottom: '1.5rem',
       }}>
@@ -108,15 +144,15 @@ export default function Hero() {
         transition: 'border-color 0.3s, background 0.3s',
       }}
         onMouseEnter={e => {
-          e.currentTarget.style.background = 'rgba(201,79,42,0.1)'
-          e.currentTarget.style.borderColor = 'var(--ember)'
+          e.currentTarget.style.background = 'rgba(201,168,76,0.1)'
+          e.currentTarget.style.borderColor = 'var(--gold)'
         }}
         onMouseLeave={e => {
           e.currentTarget.style.background = 'transparent'
           e.currentTarget.style.borderColor = 'rgba(240,235,227,0.3)'
         }}
       >
-        Begin your inquiry <span style={{ color: 'var(--ember)' }}>→</span>
+        Begin your inquiry <span style={{ color: 'var(--gold)' }}>→</span>
       </a>
 
       {/* Scroll indicator */}
@@ -132,7 +168,7 @@ export default function Hero() {
       }}>
         <div style={{
           width: '0.5px', height: '60px',
-          background: 'linear-gradient(to bottom, transparent, var(--ember))',
+          background: 'linear-gradient(to bottom, transparent, var(--gold))',
           animation: 'scrollpulse 2s ease-in-out infinite',
         }} />
         Scroll

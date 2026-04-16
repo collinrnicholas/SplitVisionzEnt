@@ -177,7 +177,7 @@ function PortfolioItem({ work, index }: { work: typeof works[0], index: number }
           fontFamily: "'Space Mono', monospace",
           fontSize: '0.55rem',
           letterSpacing: '0.2em',
-          color: 'var(--ember)',
+          color: 'var(--gold)',
           textTransform: 'uppercase',
           marginBottom: '0.3rem',
         }}>{work.tag}</div>
