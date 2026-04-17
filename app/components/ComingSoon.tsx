@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useReveal } from '../hooks/useReveal'
 
-export default function SkateTeam() {
+export default function ComingSoon({ id, title }: { id: string, title: string }) {
   const [ref, visible] = useReveal()
 
   const revealStyle = (delay = 0): React.CSSProperties => ({
@@ -13,9 +13,8 @@ export default function SkateTeam() {
   })
 
   return (
-    <section id="skateteam" className="skateteam-section">
-      {/* Watermark logo */}
-      <div className="skateteam-watermark" aria-hidden="true">
+    <section id={id} className="coming-soon-section">
+      <div className="coming-soon-watermark" aria-hidden="true">
         <Image
           src="/images/sv-logo2.jpeg"
           alt=""
@@ -25,15 +24,14 @@ export default function SkateTeam() {
         />
       </div>
 
-      {/* Decorative lines */}
-      <svg className="skateteam-lines" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice"
+      <svg className="coming-soon-lines" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <line x1="0" y1="150" x2="1400" y2="150" stroke="rgba(58,54,50,0.25)" strokeWidth="0.5"/>
         <line x1="0" y1="450" x2="1400" y2="450" stroke="rgba(58,54,50,0.15)" strokeWidth="0.5"/>
         <line x1="700" y1="0" x2="700" y2="600" stroke="rgba(58,54,50,0.08)" strokeWidth="0.5"/>
       </svg>
 
-      <div ref={ref} className="skateteam-inner">
+      <div ref={ref} className="coming-soon-inner">
         <div style={revealStyle(0)}>
           <div style={{
             fontFamily: "'Space Mono', monospace",
@@ -46,23 +44,23 @@ export default function SkateTeam() {
         </div>
 
         <div style={revealStyle(0.15)}>
-          <h2 className="skateteam-heading">Skate Team</h2>
+          <h2 className="coming-soon-heading">{title}</h2>
         </div>
 
         <div style={revealStyle(0.3)}>
-          <div className="skateteam-divider" />
+          <div className="coming-soon-divider" />
         </div>
 
         <div style={revealStyle(0.45)}>
-          <p className="skateteam-teaser">
+          <p className="coming-soon-teaser">
             Something is coming. Check back soon.
           </p>
-          <div className="skateteam-underline" aria-hidden="true" />
+          <div className="coming-soon-underline" aria-hidden="true" />
         </div>
       </div>
 
       <style>{`
-        .skateteam-section {
+        .coming-soon-section {
           position: relative;
           overflow: hidden;
           padding: 4rem var(--pad);
@@ -73,7 +71,7 @@ export default function SkateTeam() {
           justify-content: center;
           min-height: 80vh;
         }
-        .skateteam-watermark {
+        .coming-soon-watermark {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -83,7 +81,7 @@ export default function SkateTeam() {
           pointer-events: none;
           z-index: 0;
         }
-        .skateteam-lines {
+        .coming-soon-lines {
           position: absolute;
           inset: 0;
           width: 100%;
@@ -91,13 +89,13 @@ export default function SkateTeam() {
           pointer-events: none;
           z-index: 0;
         }
-        .skateteam-inner {
+        .coming-soon-inner {
           position: relative;
           z-index: 1;
           max-width: 720px;
           margin: 0 auto;
         }
-        .skateteam-heading {
+        .coming-soon-heading {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 300;
           font-style: italic;
@@ -108,14 +106,14 @@ export default function SkateTeam() {
           text-shadow: 0 0 60px rgba(201,168,76,0.15);
           margin: 0;
         }
-        .skateteam-divider {
+        .coming-soon-divider {
           width: 60px;
           height: 0.5px;
           background: var(--gold);
           margin: 2.5rem auto;
           opacity: 0.6;
         }
-        .skateteam-teaser {
+        .coming-soon-teaser {
           font-family: 'Space Mono', monospace;
           font-size: 0.7rem;
           letter-spacing: 0.3em;
@@ -124,23 +122,23 @@ export default function SkateTeam() {
           margin: 0 0 1.25rem;
           line-height: 1.9;
         }
-        .skateteam-underline {
+        .coming-soon-underline {
           width: 120px;
           height: 1px;
           margin: 0 auto;
           background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
-          animation: skateteam-pulse 2.8s ease-in-out infinite;
+          animation: coming-soon-pulse 2.8s ease-in-out infinite;
         }
-        @keyframes skateteam-pulse {
+        @keyframes coming-soon-pulse {
           0%, 100% { opacity: 0.25; transform: scaleX(0.6); }
           50% { opacity: 1; transform: scaleX(1); }
         }
         @media (min-width: 768px) {
-          .skateteam-section {
+          .coming-soon-section {
             padding: 10rem var(--pad);
             min-height: 90vh;
           }
-          .skateteam-teaser {
+          .coming-soon-teaser {
             font-size: 0.8rem;
           }
         }
