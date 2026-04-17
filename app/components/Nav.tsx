@@ -7,6 +7,9 @@ const links = [
   { label: 'Work', href: '#portfolio' },
   { label: 'Process', href: '#process' },
   { label: 'Book', href: '#booking' },
+  { label: 'Artist', href: '#artist' },
+  { label: 'Car Club', href: '#carclub' },
+  { label: 'Skate Team', href: '#skateteam' },
 ]
 
 export default function Nav() {
@@ -30,7 +33,7 @@ export default function Nav() {
         }}>SPLIT VISIONZ</a>
 
         {/* Desktop links */}
-        <ul className="nav-desktop" style={{ display: 'flex', gap: '2.5rem', listStyle: 'none' }}>
+        <ul className="nav-desktop" style={{ display: 'flex', gap: '1.75rem', listStyle: 'none' }}>
           {links.map(({ label, href }) => (
             <li key={href}>
               <a href={href} style={{

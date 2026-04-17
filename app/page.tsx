@@ -2,6 +2,7 @@ import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Manifesto from './components/Manifesto'
 import Portfolio from './components/Portfolio'
+import SkateTeam from './components/SkateTeam'
 import Process from './components/Process'
 import Booking from './components/Booking'
 import Footer from './components/Footer'
@@ -16,6 +17,8 @@ export default function Home() {
         <Manifesto />
         <div style={{ width: '100%', height: '0.5px', background: 'var(--dim)' }} />
         <Portfolio />
+        <div style={{ width: '100%', height: '0.5px', background: 'var(--dim)' }} />
+        <SkateTeam />
         <div style={{ width: '100%', height: '0.5px', background: 'var(--dim)' }} />
         <Process />
         <div style={{ width: '100%', height: '0.5px', background: 'var(--dim)' }} />

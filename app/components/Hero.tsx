@@ -57,7 +57,7 @@ export default function Hero() {
       }}>
         {!logoError ? (
           <Image
-            src="/images/sv-logo.png"
+            src="/images/sv-logo2.jpeg"
             alt="Split Visionz"
             width={280}
             height={0}
