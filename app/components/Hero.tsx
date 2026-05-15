@@ -57,7 +57,7 @@ export default function Hero() {
       }}>
         {!logoError ? (
           <Image
-            src="/images/sv-logo2.jpeg"
+            src="/images/Split_Visionz_Broken_Heart_Shirt_More_Flourishes.png"
             alt="Split Visionz"
             width={280}
             height={0}

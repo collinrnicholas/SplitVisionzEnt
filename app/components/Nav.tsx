@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 const links = [
   { label: 'Studio', href: '#manifesto' },
@@ -24,13 +25,15 @@ export default function Nav() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '1.5rem var(--pad)',
       }}>
-        <a href="#hero" style={{
-          fontFamily: "'Bebas Neue', cursive",
-          fontSize: '2rem',
-          letterSpacing: '0.18em',
-          color: 'var(--bone)',
-          textDecoration: 'none',
-        }}>SPLIT VISIONZ</a>
+        <a href="#hero" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Image
+            src="/images/Split_Visionz_Hardstyle_Grunge.png"
+            alt="Split Visionz"
+            height={48}
+            width={0}
+            style={{ width: 'auto', height: '48px' }}
+          />
+        </a>
 
         {/* Desktop links */}
         <ul className="nav-desktop" style={{ display: 'flex', gap: '1.75rem', listStyle: 'none' }}>
