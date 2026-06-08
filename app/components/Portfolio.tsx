@@ -28,7 +28,7 @@ export default function Portfolio() {
   const trackRef = useRef<HTMLDivElement>(null)
   const [arrowHover, setArrowHover] = useState<'left' | 'right' | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
-  const loopTimer = useRef<ReturnType<typeof setTimeout>>()
+  const loopTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   // On mount: jump to start of middle set (no animation)
   useEffect(() => {
