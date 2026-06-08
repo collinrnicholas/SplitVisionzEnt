@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: { url: '/icon.jpeg', type: 'image/jpeg' },
+    apple: { url: '/apple-icon.jpeg', type: 'image/jpeg' },
+  },
   openGraph: {
     title: 'Split Visionz | Custom Tattoo Artist | Springfield, VA',
     description:
