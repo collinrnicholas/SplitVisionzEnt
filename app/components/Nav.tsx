@@ -27,7 +27,7 @@ export default function Nav() {
       }}>
         <a href="#hero" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
           <Image
-            src="/images/Split_Visionz_Hardstyle_Grunge.png"
+            src="/images/Split%20Visionz%20Hardstyle%20Grunge.png"
             alt="Split Visionz"
             height={48}
             width={0}
