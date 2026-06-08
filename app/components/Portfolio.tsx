@@ -13,40 +13,74 @@ const photos = [
   { src: '/images/portfolio/IMG_6086.jpg', label: 'No. 06' },
 ]
 
+const N = photos.length
+// [clones of last set] [real items] [clones of first set]
+const loopPhotos = [...photos, ...photos, ...photos]
+
+function getItemWidth(track: HTMLDivElement): number {
+  const card = track.querySelector<HTMLDivElement>('.portfolio-card')
+  if (!card) return 0
+  return card.offsetWidth + (parseFloat(getComputedStyle(track).gap) || 12)
+}
+
 export default function Portfolio() {
   const [headerRef, headerVisible] = useReveal()
   const trackRef = useRef<HTMLDivElement>(null)
   const [arrowHover, setArrowHover] = useState<'left' | 'right' | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const loopTimer = useRef<ReturnType<typeof setTimeout>>()
 
-  const scroll = useCallback((dir: 1 | -1) => {
+  // On mount: jump to start of middle set (no animation)
+  useEffect(() => {
     const track = trackRef.current
     if (!track) return
-    const cardWidth = track.querySelector<HTMLDivElement>('.portfolio-card')?.offsetWidth ?? 400
-    track.scrollBy({ left: dir * (cardWidth + 20), behavior: 'smooth' })
+    const init = () => {
+      const w = getItemWidth(track)
+      if (!w) { requestAnimationFrame(init); return }
+      track.scrollLeft = N * w
+    }
+    requestAnimationFrame(init)
   }, [])
 
-  const scrollToIndex = useCallback((i: number) => {
-    const track = trackRef.current
-    if (!track) return
-    const cardWidth = track.querySelector<HTMLDivElement>('.portfolio-card')?.offsetWidth ?? 400
-    const gap = parseFloat(getComputedStyle(track).gap) || 12
-    track.scrollTo({ left: i * (cardWidth + gap), behavior: 'smooth' })
-  }, [])
-
+  // Update active dot + debounced silent teleport back to middle set
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
 
     const onScroll = () => {
-      const cardWidth = track.querySelector<HTMLDivElement>('.portfolio-card')?.offsetWidth ?? 1
-      const gap = parseFloat(getComputedStyle(track).gap) || 12
-      const index = Math.round(track.scrollLeft / (cardWidth + gap))
-      setActiveIndex(Math.min(Math.max(index, 0), photos.length - 1))
+      const w = getItemWidth(track)
+      if (!w) return
+      const idx = Math.round(track.scrollLeft / w)
+      setActiveIndex(((idx % N) + N) % N)
+
+      clearTimeout(loopTimer.current)
+      loopTimer.current = setTimeout(() => {
+        const cur = Math.round(track.scrollLeft / w)
+        if (cur < N) {
+          track.scrollLeft = (cur + N) * w
+        } else if (cur >= N * 2) {
+          track.scrollLeft = (cur - N) * w
+        }
+      }, 200)
     }
 
     track.addEventListener('scroll', onScroll, { passive: true })
-    return () => track.removeEventListener('scroll', onScroll)
+    return () => {
+      track.removeEventListener('scroll', onScroll)
+      clearTimeout(loopTimer.current)
+    }
+  }, [])
+
+  const scroll = useCallback((dir: 1 | -1) => {
+    const track = trackRef.current
+    if (!track) return
+    track.scrollBy({ left: dir * getItemWidth(track), behavior: 'smooth' })
+  }, [])
+
+  const scrollToIndex = useCallback((i: number) => {
+    const track = trackRef.current
+    if (!track) return
+    track.scrollTo({ left: (N + i) * getItemWidth(track), behavior: 'smooth' })
   }, [])
 
   return (
@@ -82,7 +116,6 @@ export default function Portfolio() {
             }}>PORTFOLIO</h2>
           </div>
 
-          {/* Arrow controls — desktop only */}
           <div className="portfolio-arrows" style={{ display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem' }}>
             {(['left', 'right'] as const).map(dir => (
               <button
@@ -92,11 +125,8 @@ export default function Portfolio() {
                 onMouseLeave={() => setArrowHover(null)}
                 aria-label={`Scroll ${dir}`}
                 style={{
-                  width: '52px',
-                  height: '52px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: '52px', height: '52px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: arrowHover === dir ? 'rgba(201,168,76,0.1)' : 'transparent',
                   border: `0.5px solid ${arrowHover === dir ? 'var(--gold)' : 'var(--mid)'}`,
                   color: arrowHover === dir ? 'var(--gold)' : 'var(--ash)',
@@ -113,7 +143,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Carousel track */}
+      {/* Carousel track — 18 cards (6 clones + 6 real + 6 clones) */}
       <div
         ref={trackRef}
         className="portfolio-track"
@@ -125,8 +155,13 @@ export default function Portfolio() {
           paddingBottom: '1rem',
         }}
       >
-        {photos.map((p, i) => (
-          <PortfolioCard key={p.src} photo={p} index={i} />
+        {loopPhotos.map((p, i) => (
+          <PortfolioCard
+            key={`${p.src}-${i}`}
+            photo={p}
+            index={i % N}
+            clone={i < N || i >= N * 2}
+          />
         ))}
       </div>
 
@@ -154,24 +189,18 @@ export default function Portfolio() {
 
       {/* Edge fades */}
       <div className="portfolio-fade-left" style={{
-        position: 'absolute',
-        top: 0, left: 0, bottom: 0,
+        position: 'absolute', top: 0, left: 0, bottom: 0,
         background: 'linear-gradient(to right, var(--ink), transparent)',
-        pointerEvents: 'none',
-        zIndex: 2,
+        pointerEvents: 'none', zIndex: 2,
       }} />
       <div className="portfolio-fade-right" style={{
-        position: 'absolute',
-        top: 0, right: 0, bottom: 0,
+        position: 'absolute', top: 0, right: 0, bottom: 0,
         background: 'linear-gradient(to left, var(--ink), transparent)',
-        pointerEvents: 'none',
-        zIndex: 2,
+        pointerEvents: 'none', zIndex: 2,
       }} />
 
       <style>{`
-        .portfolio-section {
-          padding: 4rem 0;
-        }
+        .portfolio-section { padding: 4rem 0; }
         .portfolio-track {
           gap: 12px;
           padding-left: var(--pad);
@@ -182,12 +211,7 @@ export default function Portfolio() {
         .portfolio-track::-webkit-scrollbar { display: none; }
         .portfolio-fade-left,
         .portfolio-fade-right { width: var(--pad); }
-
-        .portfolio-card {
-          min-width: 85vw;
-          height: 420px;
-        }
-
+        .portfolio-card { min-width: 85vw; height: 420px; }
         .portfolio-dots {
           display: flex;
           justify-content: center;
@@ -195,7 +219,6 @@ export default function Portfolio() {
           gap: 8px;
           padding: 1.5rem var(--pad) 0.5rem;
         }
-
         @media (min-width: 768px) {
           .portfolio-section { padding: 10rem 0; }
           .portfolio-track { gap: 20px; }
@@ -214,14 +237,20 @@ export default function Portfolio() {
   )
 }
 
-function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: number }) {
+function PortfolioCard({
+  photo, index, clone,
+}: {
+  photo: typeof photos[0]
+  index: number
+  clone?: boolean
+}) {
   const [ref, visible] = useReveal()
   const [hovered, setHovered] = useState(false)
   const [errored, setErrored] = useState(false)
 
   return (
     <div
-      ref={ref}
+      ref={clone ? undefined : ref}
       className="portfolio-card"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -232,9 +261,11 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
         background: 'var(--dim)',
         cursor: 'crosshair',
         scrollSnapAlign: 'start',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(40px)',
-        transition: `opacity 1s ease ${index * 0.1}s, transform 1s ease ${index * 0.1}s`,
+        opacity: clone ? 1 : (visible ? 1 : 0),
+        transform: clone ? 'none' : (visible ? 'translateY(0)' : 'translateY(40px)'),
+        transition: clone
+          ? 'none'
+          : `opacity 1s ease ${index * 0.1}s, transform 1s ease ${index * 0.1}s`,
       }}
     >
       {!errored ? (
@@ -266,7 +297,6 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
         </div>
       )}
 
-      {/* Gold border glow */}
       <div style={{
         position: 'absolute', inset: 0,
         border: `1px solid ${hovered ? 'var(--gold)' : 'transparent'}`,
@@ -277,10 +307,8 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
         pointerEvents: 'none',
       }} />
 
-      {/* Caption */}
       <div style={{
-        position: 'absolute',
-        bottom: 0, left: 0, right: 0,
+        position: 'absolute', bottom: 0, left: 0, right: 0,
         padding: '0.75rem 1rem',
         opacity: 0.5,
         pointerEvents: 'none',
