@@ -32,7 +32,7 @@ export default function Nav() {
             height={48}
             width={160}
             sizes="160px"
-            style={{ width: 'auto', height: '48px' }}
+            style={{ width: 'auto', height: '48px', filter: 'brightness(0) invert(1)' }}
           />
         </a>
 

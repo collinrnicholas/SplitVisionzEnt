@@ -63,7 +63,7 @@ export default function Hero() {
             height={280}
             sizes="(max-width: 767px) 200px, 280px"
             onError={() => setLogoError(true)}
-            style={{ width: '100%', maxWidth: '280px', height: 'auto', opacity: 1 }}
+            style={{ width: '100%', maxWidth: '280px', height: 'auto', filter: 'brightness(0) invert(1)' }}
           />
         ) : (
           <span aria-label="SV monogram" className="hero-fallback-logo" style={{
