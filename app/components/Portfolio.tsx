@@ -17,7 +17,7 @@ export default function Portfolio() {
   const [headerRef, headerVisible] = useReveal()
   const trackRef = useRef<HTMLDivElement>(null)
   const [arrowHover, setArrowHover] = useState<'left' | 'right' | null>(null)
-  const pausedRef = useRef(false)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   const scroll = useCallback((dir: 1 | -1) => {
     const track = trackRef.current
@@ -26,45 +26,27 @@ export default function Portfolio() {
     track.scrollBy({ left: dir * (cardWidth + 20), behavior: 'smooth' })
   }, [])
 
+  const scrollToIndex = useCallback((i: number) => {
+    const track = trackRef.current
+    if (!track) return
+    const cardWidth = track.querySelector<HTMLDivElement>('.portfolio-card')?.offsetWidth ?? 400
+    const gap = parseFloat(getComputedStyle(track).gap) || 12
+    track.scrollTo({ left: i * (cardWidth + gap), behavior: 'smooth' })
+  }, [])
+
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const speed = isMobile ? 0.018 : 0.033
-
-    let raf: number
-    let last = 0
-
-    function step(time: number) {
-      if (last && !pausedRef.current) {
-        const delta = time - last
-        track!.scrollLeft += delta * speed
-        if (track!.scrollLeft >= track!.scrollWidth - track!.clientWidth) {
-          track!.scrollLeft = 0
-        }
-      }
-      last = time
-      raf = requestAnimationFrame(step)
+    const onScroll = () => {
+      const cardWidth = track.querySelector<HTMLDivElement>('.portfolio-card')?.offsetWidth ?? 1
+      const gap = parseFloat(getComputedStyle(track).gap) || 12
+      const index = Math.round(track.scrollLeft / (cardWidth + gap))
+      setActiveIndex(Math.min(Math.max(index, 0), photos.length - 1))
     }
 
-    raf = requestAnimationFrame(step)
-
-    const pause = () => { pausedRef.current = true }
-    const resume = () => { pausedRef.current = false; last = 0 }
-
-    track.addEventListener('mouseenter', pause)
-    track.addEventListener('mouseleave', resume)
-    track.addEventListener('touchstart', pause, { passive: true })
-    track.addEventListener('touchend', resume)
-
-    return () => {
-      cancelAnimationFrame(raf)
-      track.removeEventListener('mouseenter', pause)
-      track.removeEventListener('mouseleave', resume)
-      track.removeEventListener('touchstart', pause)
-      track.removeEventListener('touchend', resume)
-    }
+    track.addEventListener('scroll', onScroll, { passive: true })
+    return () => track.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
@@ -139,11 +121,34 @@ export default function Portfolio() {
           display: 'flex',
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
           paddingBottom: '1rem',
         }}
       >
         {photos.map((p, i) => (
           <PortfolioCard key={p.src} photo={p} index={i} />
+        ))}
+      </div>
+
+      {/* Dot indicators — mobile only */}
+      <div className="portfolio-dots" aria-hidden="true">
+        {photos.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToIndex(i)}
+            aria-label={`Go to photo ${i + 1}`}
+            style={{
+              width: i === activeIndex ? '20px' : '6px',
+              height: '6px',
+              borderRadius: '3px',
+              background: i === activeIndex ? 'var(--gold)' : 'var(--mid)',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'width 0.3s ease, background 0.3s ease',
+              flexShrink: 0,
+            }}
+          />
         ))}
       </div>
 
@@ -183,6 +188,14 @@ export default function Portfolio() {
           height: 420px;
         }
 
+        .portfolio-dots {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          padding: 1.5rem var(--pad) 0.5rem;
+        }
+
         @media (min-width: 768px) {
           .portfolio-section { padding: 10rem 0; }
           .portfolio-track { gap: 20px; }
@@ -190,6 +203,8 @@ export default function Portfolio() {
             min-width: calc((100vw - 6rem - 40px) / 2.5);
             height: 500px;
           }
+          .portfolio-dots { display: none; }
+          .portfolio-arrows { display: flex !important; }
         }
         @media (max-width: 767px) {
           .portfolio-arrows { display: none !important; }
@@ -262,7 +277,7 @@ function PortfolioCard({ photo, index }: { photo: typeof photos[0]; index: numbe
         pointerEvents: 'none',
       }} />
 
-      {/* Caption — subtle, bottom-pinned */}
+      {/* Caption */}
       <div style={{
         position: 'absolute',
         bottom: 0, left: 0, right: 0,

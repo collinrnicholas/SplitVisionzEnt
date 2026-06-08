@@ -85,7 +85,9 @@ export default function Manifesto() {
           color: 'var(--ash)',
           textDecoration: 'none',
           borderBottom: '0.5px solid var(--mid)',
-          paddingBottom: '0.25rem',
+          paddingBottom: '0.35rem',
+          paddingTop: '0.5rem',
+          display: 'inline-block',
           transition: 'color 0.3s',
         }}
           onMouseEnter={e => (e.currentTarget.style.color = 'var(--bone)')}
@@ -95,15 +97,15 @@ export default function Manifesto() {
 
       <style>{`
         .manifesto-section {
-          padding: 4rem var(--pad);
+          padding: 5rem var(--pad);
           display: grid;
           grid-template-columns: 1fr;
-          gap: 3rem;
+          gap: 3.5rem;
           align-items: center;
         }
         .manifesto-stats {
           display: flex;
-          gap: 2rem;
+          gap: 2.5rem;
           flex-wrap: wrap;
         }
         @media (min-width: 768px) {

@@ -64,7 +64,9 @@ export default function Nav() {
           style={{
             display: 'none',
             background: 'none', border: 'none', cursor: 'pointer',
-            padding: '0.5rem',
+            padding: '0.75rem',
+            minWidth: '44px', minHeight: '44px',
+            alignItems: 'center', justifyContent: 'center',
           }}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,6 +102,8 @@ export default function Nav() {
                 textTransform: 'uppercase' as const,
                 color: 'var(--ash)',
                 textDecoration: 'none',
+                display: 'block',
+                padding: '0.5rem 0',
               }}>{label}</a>
             </li>
           ))}

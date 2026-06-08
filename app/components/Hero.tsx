@@ -176,10 +176,10 @@ export default function Hero() {
         @media (max-width: 767px) {
           .hero-logo { width: 200px; }
           .hero-fallback-logo { font-size: 5.5rem; }
-          .hero-eyebrow { font-size: 0.5rem; letter-spacing: 0.2em; }
-          .hero-headline { font-size: clamp(1.6rem, 6vw, 2.2rem); letter-spacing: 0.15em; }
-          .hero-subtitle { font-size: 1rem; max-width: 300px; }
-          .hero-cta { width: 100%; text-align: center; }
+          .hero-eyebrow { font-size: 0.6rem; letter-spacing: 0.2em; }
+          .hero-headline { font-size: clamp(1.8rem, 6vw, 2.4rem); letter-spacing: 0.15em; }
+          .hero-subtitle { font-size: 1.05rem; max-width: 320px; }
+          .hero-cta { width: 100%; text-align: center; padding: 1.1rem 2rem; font-size: 0.65rem; }
         }
       `}</style>
     </section>

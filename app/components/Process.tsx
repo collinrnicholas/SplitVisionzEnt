@@ -55,15 +55,16 @@ export default function Process() {
 
       <style>{`
         .process-header {
-          padding: 4rem var(--pad) 0;
+          padding: 5rem var(--pad) 0;
         }
         .process-grid {
           display: grid;
           grid-template-columns: 1fr;
           margin-top: 2.5rem;
+          padding-bottom: 5rem;
         }
         .process-step {
-          padding: 2rem var(--pad);
+          padding: 2.5rem var(--pad);
           border-bottom: 0.5px solid var(--mid);
         }
         @media (min-width: 768px) {

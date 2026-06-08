@@ -17,10 +17,11 @@ export default function Footer() {
           { label: 'Contact', href: '#booking', external: false },
         ].map(({ label, href, external }) => (
           <a key={label} href={href}
+            className="footer-link"
             {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             style={{
             fontFamily: "'Space Mono', monospace",
-            fontSize: '0.55rem',
+            fontSize: '0.6rem',
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
             color: 'var(--mid)',
@@ -42,17 +43,21 @@ export default function Footer() {
 
       <style>{`
         .site-footer {
-          padding: 3rem var(--pad);
+          padding: 4rem var(--pad);
           border-top: 0.5px solid var(--dim);
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1.5rem;
+          gap: 2rem;
           text-align: center;
         }
         .footer-links {
           display: flex;
-          gap: 1.5rem;
+          gap: 2rem;
+        }
+        .footer-link {
+          display: block;
+          padding: 0.5rem 0;
         }
         @media (min-width: 768px) {
           .site-footer {
