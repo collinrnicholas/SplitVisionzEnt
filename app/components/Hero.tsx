@@ -58,7 +58,7 @@ export default function Hero() {
         {!logoError ? (
           <Image
             src="/images/Split%20Visionz%20Broken%20Heart%20Shirt%20More%20Flourishes.png"
-            alt="Split Visionz"
+            alt="Split Visionz — private tattoo studio by Elliot Brawner in Springfield, Virginia"
             width={280}
             height={280}
             sizes="(max-width: 767px) 200px, 280px"

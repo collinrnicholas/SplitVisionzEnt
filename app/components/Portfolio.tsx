@@ -5,12 +5,12 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 
 const photos = [
-  { src: '/images/portfolio/DSC03411.png', label: 'No. 01' },
-  { src: '/images/portfolio/IMG_4496.jpg', label: 'No. 02' },
-  { src: '/images/portfolio/IMG_4957.jpg', label: 'No. 03' },
-  { src: '/images/portfolio/IMG_5231.jpg', label: 'No. 04' },
-  { src: '/images/portfolio/IMG_5333.jpg', label: 'No. 05' },
-  { src: '/images/portfolio/IMG_6086.jpg', label: 'No. 06' },
+  { src: '/images/portfolio/DSC03411.png', label: 'No. 01', alt: 'Custom tattoo by Elliot Brawner — Split Visionz tattoo studio, Springfield VA' },
+  { src: '/images/portfolio/IMG_4496.jpg', label: 'No. 02', alt: 'Ornate tattoo work by Elliot Brawner — Split Visionz private studio, Northern Virginia' },
+  { src: '/images/portfolio/IMG_4957.jpg', label: 'No. 03', alt: 'Detailed custom tattoo by Elliot Brawner — Split Visionz Springfield Virginia' },
+  { src: '/images/portfolio/IMG_5231.jpg', label: 'No. 04', alt: 'Split Visionz tattoo portfolio — custom work by Elliot Brawner, Springfield VA' },
+  { src: '/images/portfolio/IMG_5333.jpg', label: 'No. 05', alt: 'Private studio tattoo commission by Elliot Brawner — Split Visionz, Northern Virginia' },
+  { src: '/images/portfolio/IMG_6086.jpg', label: 'No. 06', alt: 'Custom tattoo artist Elliot Brawner — Split Visionz tattoo studio Springfield VA' },
 ]
 
 const N = photos.length
@@ -271,7 +271,7 @@ function PortfolioCard({
       {!errored ? (
         <Image
           src={photo.src}
-          alt={photo.label}
+          alt={photo.alt}
           fill
           sizes="(max-width: 767px) 85vw, 40vw"
           onError={() => setErrored(true)}

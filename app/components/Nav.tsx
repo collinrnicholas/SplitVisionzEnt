@@ -28,7 +28,7 @@ export default function Nav() {
         <a href="#hero" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
           <Image
             src="/images/Split%20Visionz%20Hardstyle%20Grunge.png"
-            alt="Split Visionz"
+            alt="Split Visionz logo — custom tattoo studio by Elliot Brawner, Springfield VA"
             height={48}
             width={160}
             sizes="160px"
