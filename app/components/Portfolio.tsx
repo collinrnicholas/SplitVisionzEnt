@@ -5,7 +5,7 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
 
 const photos = [
-  { src: '/images/portfolio/DSC03411.jpg', label: 'No. 01' },
+  { src: '/images/portfolio/DSC03411.png', label: 'No. 01' },
   { src: '/images/portfolio/IMG_4496.jpg', label: 'No. 02' },
   { src: '/images/portfolio/IMG_4957.jpg', label: 'No. 03' },
   { src: '/images/portfolio/IMG_5231.jpg', label: 'No. 04' },
