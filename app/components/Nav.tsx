@@ -30,7 +30,8 @@ export default function Nav() {
             src="/images/Split%20Visionz%20Hardstyle%20Grunge.png"
             alt="Split Visionz"
             height={48}
-            width={0}
+            width={160}
+            sizes="160px"
             style={{ width: 'auto', height: '48px' }}
           />
         </a>

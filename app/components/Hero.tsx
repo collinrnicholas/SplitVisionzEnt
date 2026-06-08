@@ -60,9 +60,10 @@ export default function Hero() {
             src="/images/Split%20Visionz%20Broken%20Heart%20Shirt%20More%20Flourishes.png"
             alt="Split Visionz"
             width={280}
-            height={0}
+            height={280}
+            sizes="(max-width: 767px) 200px, 280px"
             onError={() => setLogoError(true)}
-            style={{ width: '100%', maxWidth: '280px', height: 'auto', opacity: 0.9 }}
+            style={{ width: '100%', maxWidth: '280px', height: 'auto', opacity: 1 }}
           />
         ) : (
           <span aria-label="SV monogram" className="hero-fallback-logo" style={{
