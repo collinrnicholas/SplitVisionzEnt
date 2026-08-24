@@ -5,6 +5,7 @@ import Portfolio from './components/Portfolio'
 import Process from './components/Process'
 import Booking from './components/Booking'
 import Footer from './components/Footer'
+import Chatbot from './components/Chatbot'
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
         <Booking />
       </main>
       <Footer />
+      <Chatbot />
     </>
   )
 }

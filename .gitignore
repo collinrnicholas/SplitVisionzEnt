@@ -33,6 +33,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# visitor memory store (contains PII — names, emails, fingerprints)
+data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
