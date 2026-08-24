@@ -4,11 +4,21 @@ import { useState, useRef, useEffect, FormEvent } from 'react';
 
 type Msg = { role: 'user' | 'bot'; text: string };
 
-const INITIAL: Msg[] = [
-  {
-    role: 'bot',
-    text: "Yo, Elliot here from Split Vizions. What're we dreaming up today?",
-  },
+const CHAT_KEY = 'sv_chat';
+const OPENED_KEY = 'sv_opened';
+
+const GREETING =
+  "Yo, Elliot here from Split Vizions. What're we dreaming up today?";
+
+/** Default starts empty — transcript is restored from localStorage when present. */
+const INITIAL: Msg[] = [{ role: 'bot', text: GREETING }];
+
+/** Quick tap-to-send starters shown on a fresh chat. */
+const SUGGESTIONS = [
+  'New tattoo — black & grey',
+  'Cover-up',
+  'Pricing',
+  'Touch-up / fix-up',
 ];
 
 /** Get-or-create a stable anonymous visitor id, persisted in localStorage. */
@@ -18,9 +28,10 @@ function getVisitorId(): string {
   try {
     let id = localStorage.getItem(KEY);
     if (!id) {
-      // crypto.randomUUID is fine on modern browsers.
       id =
-        (window.crypto && 'randomUUID' in crypto ? crypto.randomUUID() : 'anon-' + Math.random().toString(36).slice(2) + Date.now().toString(36));
+        window.crypto && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : 'anon-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
       localStorage.setItem(KEY, id);
     }
     return id;
@@ -29,27 +40,81 @@ function getVisitorId(): string {
   }
 }
 
+/** Load the saved transcript from localStorage, or fall back to the greeting. */
+function loadChat(): Msg[] {
+  if (typeof window === 'undefined') return INITIAL;
+  try {
+    const saved = localStorage.getItem(CHAT_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as Msg[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    /* ignore corrupt storage */
+  }
+  return INITIAL;
+}
+
+/** Persist the transcript so it survives a hard refresh. */
+function saveChat(msgs: Msg[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(CHAT_KEY, JSON.stringify(msgs));
+  } catch {
+    /* storage full / unavailable — best effort */
+  }
+}
+
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>(INITIAL);
+  const [messages, setMessages] = useState<Msg[]>(loadChat);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [teaser, setTeaser] = useState(false);
+  const [firstOpen, setFirstOpen] = useState(true);
   const [visitorId] = useState<string>(getVisitorId);
 
-  const msgsRef = useRef<Msg[]>(INITIAL);
+  const msgsRef = useRef<Msg[]>(messages);
   const endRef = useRef<HTMLDivElement>(null);
   const firstName = useRef<string | null>(null);
 
-  // Auto-open teaser bubble a few seconds after load (once per session), so the
-  // bot "opens up and starts the convo" without hijacking the whole page.
+  // Persist the transcript to localStorage on every change.
   useEffect(() => {
+    msgsRef.current = messages;
+    saveChat(messages);
+  }, [messages]);
+
+  // Engagement: on a visitor's FIRST-ever visit, auto-open the full panel after
+  // a short beat. Returning visitors who already opened/dismissed get the
+  // quieter teaser bubble instead, so we don't nag people already familiar.
+  useEffect(() => {
+    let hasOpened = false;
+    try {
+      hasOpened = localStorage.getItem(OPENED_KEY) === '1';
+    } catch {
+      /* ignore */
+    }
+
+    if (!hasOpened) {
+      const t = window.setTimeout(() => {
+        setOpen(true);
+        setTeaser(false);
+        setFirstOpen(true);
+        try {
+          localStorage.setItem(OPENED_KEY, '1');
+        } catch {
+          /* ignore */
+        }
+      }, 4000);
+      return () => window.clearTimeout(t);
+    }
+
+    // Returning visitor: teaser bubble, one nudge.
     const t1 = window.setTimeout(() => {
       if (!open) setTeaser(true);
     }, 4000);
-    // If they ignore the first tease, give it one more nudge later.
     const t2 = window.setTimeout(() => {
       if (!open) setTeaser(true);
     }, 45000);
@@ -63,14 +128,8 @@ export default function Chatbot() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, open, thinking]);
 
-  function openChat() {
-    setTeaser(false);
-    setOpen(true);
-  }
-
-  async function handleSend(e: FormEvent) {
-    e.preventDefault();
-    const text = input.trim();
+  function sendText(raw: string) {
+    const text = raw.trim();
     if (!text || thinking || done) return;
 
     setInput('');
@@ -80,6 +139,11 @@ export default function Chatbot() {
     msgsRef.current = updated;
     setThinking(true);
 
+    void runChat(updated);
+  }
+
+  async function runChat(updated: Msg[]) {
+    const text = updated[updated.length - 1].text;
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -96,15 +160,9 @@ export default function Chatbot() {
 
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
+        const replyText = j?.error || 'Shoot, somethin buckled on my end. Try that again in a sec?';
         setThinking(false);
-        setMessages([
-          ...msgsRef.current,
-          { role: 'bot', text: j?.error || 'Shoot, somethin buckled on my end. Try that again in a sec?' },
-        ]);
-        msgsRef.current = [
-          ...msgsRef.current,
-          { role: 'bot', text: j?.error || 'Shoot, somethin buckled on my end. Try that again in a sec?' },
-        ];
+        pushBot(replyText);
         return;
       }
 
@@ -112,15 +170,8 @@ export default function Chatbot() {
       const reply: string = data.reply || '...';
       const lead = data.lead || {};
 
-      const withReply: Msg[] = [...msgsRef.current, { role: 'bot', text: reply }];
-      setMessages(withReply);
-      msgsRef.current = withReply;
-      setThinking(false);
-
-      // Remember the name for the rest of this session + submit back to server.
       if (lead.name) firstName.current = lead.name;
 
-      // If the lead looks rich (contact captured), fire the email server-side.
       const contact = String(lead.contact || '').trim();
       if (contact && !done) {
         setDone(true);
@@ -142,24 +193,46 @@ export default function Chatbot() {
           // email is best-effort; don't surface an error to a happy visitor
         }
       }
+
+      setThinking(false);
+      pushBot(reply);
     } catch {
       setThinking(false);
-      setMessages([
-        ...msgsRef.current,
-        { role: 'bot', text: 'Shoot, my side just hiccuped. Wanna give that one more shot?' },
-      ]);
-      msgsRef.current = [
-        ...msgsRef.current,
-        { role: 'bot', text: 'Shoot, my side just hiccuped. Wanna give that one more shot?' },
-      ];
+      pushBot('Shoot, my side just hiccuped. Wanna give that one more shot?');
     }
   }
+
+  function pushBot(text: string) {
+    const updated: Msg[] = [...msgsRef.current, { role: 'bot', text }];
+    setMessages(updated);
+    msgsRef.current = updated;
+  }
+
+  function handleSend(e: FormEvent) {
+    e.preventDefault();
+    sendText(input);
+  }
+
+  function handleOpen() {
+    setTeaser(false);
+    setOpen(true);
+    setFirstOpen(false);
+    try {
+      localStorage.setItem(OPENED_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // Show suggestion chips when the panel has just opened and the visitor hasn't
+  // said anything yet (fresh chat, no user turn).
+  const showSuggestions = open && !done && !messages.some((m) => m.role === 'user') && !thinking;
 
   return (
     <>
       {/* Launcher */}
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? setOpen(false) : handleOpen())}
         aria-label={open ? 'Close chat' : 'Open chat'}
         className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105"
         style={{ background: 'var(--gold)', color: 'var(--ink)' }}
@@ -169,7 +242,7 @@ export default function Chatbot() {
         </svg>
       </button>
 
-      {/* Teaser bubble — the bot opening the conversation */}
+      {/* Teaser bubble — quiet nudge for returning visitors. */}
       {teaser && !open && (
         <div
           className="fixed bottom-24 right-5 z-50 max-w-[260px] animate-pulse rounded-2xl rounded-br-sm px-4 py-3 text-sm shadow-xl"
@@ -183,7 +256,7 @@ export default function Chatbot() {
           </p>
           <div className="flex gap-2">
             <button
-              onClick={openChat}
+              onClick={handleOpen}
               className="rounded-full px-3 py-1 text-xs font-semibold transition-transform hover:scale-105"
               style={{ background: 'var(--gold)', color: 'var(--ink)' }}
             >
@@ -257,6 +330,22 @@ export default function Chatbot() {
             )}
             <div ref={endRef} />
           </div>
+
+          {/* Suggestion chips — tap to send. Shown on a fresh conversation. */}
+          {showSuggestions && (
+            <div className="flex flex-wrap gap-2 px-4 pb-3" style={{ background: 'var(--ink)' }}>
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => sendText(s)}
+                  className="rounded-full border px-3 py-1.5 text-xs transition-transform hover:scale-105"
+                  style={{ background: 'var(--dim)', borderColor: 'var(--gold)', color: 'var(--bonelight, var(--bone))' }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
 
           {error && (
             <div className="px-4 pb-1" style={{ color: '#e58' }}>

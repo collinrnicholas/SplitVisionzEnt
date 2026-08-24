@@ -15,6 +15,15 @@ interface LeadBody {
   timing: string
 }
 
+/** Lazily import Supabase only if configured. */
+async function getSupabase() {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  if (!url || !key) return null
+  const { createClient } = await import('@supabase/supabase-js')
+  return createClient(url, key)
+}
+
 export async function POST(req: NextRequest) {
   let body: LeadBody
   try {
@@ -35,10 +44,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'missing contact' }, { status: 400 })
   }
 
-  // No Resend key configured → degrade gracefully so the site still works
+  const leadRow = { name, contact, kind, style, placement, timing, created_at: new Date().toISOString(), source: 'split-visionz-chat' }
+
+  // --- Persistent store: Supabase (best-effort; never block the email) ---
+  let stored = false
+  try {
+    const sb = await getSupabase()
+    if (sb) {
+      const { error } = await sb.from('leads').insert(leadRow)
+      if (!error) stored = true
+      else console.error('[leads] Supabase insert failed:', error.message)
+    }
+  } catch (err) {
+    console.error('[leads] Supabase error (degraded to email-only):', err)
+  }
+
+  // --- Email: keep the existing path ---
   if (!process.env.RESEND_API_KEY) {
-    console.warn('[leads] RESEND_API_KEY not set — lead not emailed. Lead:', { name, contact, kind, style, placement, timing })
-    return NextResponse.json({ ok: true, degraded: true })
+    console.warn('[leads] RESEND_API_KEY not set — lead not emailed. Lead:', leadRow, 'stored:', stored)
+    return NextResponse.json({ ok: true, degraded: true, stored })
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY)
@@ -65,7 +89,7 @@ export async function POST(req: NextRequest) {
       subject: `🎨 New lead${name && name !== 'Not specified' ? ` from ${name}` : ''}: ${contact} — ${kind}`,
       html,
     })
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, stored })
   } catch (err) {
     console.error('[leads] Resend send failed:', err)
     return NextResponse.json({ ok: false, error: 'send failed' }, { status: 500 })
