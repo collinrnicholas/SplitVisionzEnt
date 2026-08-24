@@ -13,8 +13,8 @@ const GREETING =
 /** Default starts empty — transcript is restored from localStorage when present. */
 const INITIAL: Msg[] = [{ role: 'bot', text: GREETING }];
 
-/** Quick tap-to-send starters shown on a fresh chat. */
-const SUGGESTIONS = [
+/** Tap-to-send starters shown on a fresh chat (before the first bot reply). */
+const FRESH_HINTS = [
   'New tattoo — black & grey',
   'Cover-up',
   'Pricing',
@@ -72,6 +72,11 @@ export default function Chatbot() {
   const [thinking, setThinking] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Quick-reply chips. Fresh chat seeds the starter topics; rehydrated chats
+  // get none until the next bot reply offers options.
+  const [suggestions, setSuggestions] = useState<string[]>(() =>
+    typeof window === 'undefined' ? [] : localStorage.getItem(CHAT_KEY) ? [] : FRESH_HINTS
+  );
   const [teaser, setTeaser] = useState(false);
   const [firstOpen, setFirstOpen] = useState(true);
   const [visitorId] = useState<string>(getVisitorId);
@@ -134,6 +139,7 @@ export default function Chatbot() {
 
     setInput('');
     setError(null);
+    setSuggestions([]); // user picked a chip or typed: clear the old quick-replies
     const updated: Msg[] = [...msgsRef.current, { role: 'user', text }];
     setMessages(updated);
     msgsRef.current = updated;
@@ -162,6 +168,7 @@ export default function Chatbot() {
         const j = await res.json().catch(() => ({}));
         const replyText = j?.error || 'Shoot, somethin buckled on my end. Try that again in a sec?';
         setThinking(false);
+        setSuggestions([]);
         pushBot(replyText);
         return;
       }
@@ -169,7 +176,6 @@ export default function Chatbot() {
       const data = await res.json();
       const reply: string = data.reply || '...';
       const lead = data.lead || {};
-
       if (lead.name) firstName.current = lead.name;
 
       const contact = String(lead.contact || '').trim();
@@ -196,6 +202,13 @@ export default function Chatbot() {
 
       setThinking(false);
       pushBot(reply);
+      setSuggestions(
+        Array.isArray(data.suggestions) && data.suggestions.length > 0
+          ? data.suggestions
+          : done
+          ? ['Thanks, talk soon!']
+          : []
+      );
     } catch {
       setThinking(false);
       pushBot('Shoot, my side just hiccuped. Wanna give that one more shot?');
@@ -224,9 +237,10 @@ export default function Chatbot() {
     }
   }
 
-  // Show suggestion chips when the panel has just opened and the visitor hasn't
-  // said anything yet (fresh chat, no user turn).
-  const showSuggestions = open && !done && !messages.some((m) => m.role === 'user') && !thinking;
+  // Tap-to-send quick-replies rendered under the latest bot message. Shown on a
+  // fresh chat, or whenever the last bot reply offered options (per-reply).
+  const showQuickReplies =
+    open && !thinking && suggestions.length > 0 && !done;
 
   return (
     <>
@@ -328,18 +342,12 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
-            {/* Suggestion quick-replies — rendered as a chat message so they feel
-                like part of the conversation, not a detached toolbar. */}
-            {showSuggestions && (
+            {/* Tap-to-send quick-replies — aligned with whatever Elliot just
+                asked/offered, rendered as part of the conversation. */}
+            {showQuickReplies && (
               <div className="flex flex-col items-start gap-2">
-                <div
-                  className="max-w-[85%] rounded-2xl rounded-tl-sm px-3 py-2 text-sm"
-                  style={{ background: 'var(--dim)', border: '1px solid var(--mid)', color: 'var(--ash)' }}
-                >
-                  Quick start — tap one, or type your own:
-                </div>
                 <div className="flex flex-wrap gap-2">
-                  {SUGGESTIONS.map((s) => (
+                  {suggestions.map((s) => (
                     <button
                       key={s}
                       onClick={() => sendText(s)}
@@ -366,7 +374,7 @@ export default function Chatbot() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={done ? 'Thanks, talk soon.' : 'Type a message...'}
+              placeholder={done ? 'Thanks for your details — talk soon.' : 'Type a message...'}
               disabled={done}
               rows={1}
               className="min-w-0 flex-1 resize-none rounded-2xl bg-transparent px-3 py-2 text-sm outline-none"

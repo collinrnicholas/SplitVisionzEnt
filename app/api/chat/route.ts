@@ -45,6 +45,31 @@ const EXTRACT_SYSTEM = `You are a data-extractor. From the conversation transcri
 - contact: a phone number or email if given, else null.
 Return ONLY valid JSON. No explanation, no markdown.`;
 
+const SUGGESTS_SYSTEM = `You are a quick-reply generator for Elliot's tattoo studio chat. Given the conversation so far and the assistant's just-sent reply, return a JSON object with an array "suggestions" of 2-4 short strings (each under 6 words) the visitor could tap to continue the chat. These must ALIGN with what the assistant just asked or offered. Examples:
+- If Elliot just asked what days/times they might come by: ["Monday afternoon", "Tuesday evening", "Thursday", "Not sure yet"].
+- If he just asked about style: ["Black & grey", "Color realism", "Traditional", "Not sure yet"].
+- If he just asked placement: ["Forearm", "Chest", "Full sleeve", "Not sure"].
+- Lead question (name/phone/email): generic nudge like ["Sure, it's...", "Rather not say"].
+- If the visitor has already said everything needed or the reply is a warm wrap-up / thanks: return ["Thanks, talk soon!"].
+- Never put a question mark, markdown, or a full sentence in a suggestion.
+Return ONLY valid JSON: {"suggestions": [...]}. No explanation.`;
+
+const extractJson = (content: string): string[] => {
+  const raw = content || '';
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return [];
+  try {
+    const parsed = JSON.parse(match[0]);
+    const arr = Array.isArray(parsed?.suggestions) ? parsed.suggestions : [];
+    return arr
+      .map((s: unknown) => String(s).trim())
+      .filter((s: string) => s.length > 0 && s.length <= 30)
+      .slice(0, 4);
+  } catch {
+    return [];
+  }
+};
+
 interface ChatTurn {
   role: 'user' | 'assistant';
   content: string;
@@ -161,6 +186,33 @@ export async function POST(req: Request) {
       contact: typeof extracted.contact === 'string' ? extracted.contact : null,
     };
 
+    // 3) Generate tap-to-send quick replies that align with the just-sent reply
+    let suggestions: string[] = [];
+    try {
+      const suggRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: SUGGESTS_SYSTEM },
+            {
+              role: 'user',
+              content: `Assistant just said: "${replyText}"\n\nTranscript:\n${safe.map((m) => `${m.role}: ${m.content}`).join('\n')}`,
+            },
+          ],
+          max_tokens: 120,
+          temperature: 0,
+        }),
+      });
+      if (suggRes.ok) {
+        const suggData = await suggRes.json();
+        suggestions = extractJson(suggData?.choices?.[0]?.message?.content || '');
+      }
+    } catch {
+      suggestions = [];
+    }
+
     // Persist whatever we now know so a future visit is recognized.
     if (body.name || lead.name || lead.placement || lead.style || lead.kind || lead.contact) {
       updateVisitor(visitorKey, {
@@ -173,7 +225,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ reply: replyText, lead });
+    return NextResponse.json({ reply: replyText, lead, suggestions });
   } catch (err) {
     console.error('[chat] unexpected error', err);
     return NextResponse.json({ error: 'AI service error' }, { status: 500 });
