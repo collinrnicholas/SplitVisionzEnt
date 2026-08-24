@@ -12,7 +12,15 @@ import path from 'node:path';
  * Stored in a local JSON file (server-side only, never exposed to the browser).
  */
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Vercel serverless runs with a READ-ONLY cwd, so a file store under the
+// project dir throws EROFS on write (uncaught -> HTTP 500). Write to the
+// writable /tmp on Vercel instead. Memory there is best-effort/ephemeral per
+// warm instance — acceptable for a first visitor interaction — and it never
+// crashes the route. Local dev keeps ./data so the store persists across runs.
+const DATA_DIR =
+  process.env.VERCEL === '1'
+    ? '/tmp/split-visionz-data'
+    : path.join(process.cwd(), 'data');
 const STORE_PATH = path.join(DATA_DIR, 'visitors.json');
 
 interface VisitorRecord {
@@ -43,10 +51,15 @@ function readStore(): Record<string, VisitorRecord> {
 }
 
 function writeStore(store: Record<string, VisitorRecord>) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const tmp = STORE_PATH + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(store, null, 2));
-  fs.renameSync(tmp, STORE_PATH);
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    const tmp = STORE_PATH + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(store, null, 2));
+    fs.renameSync(tmp, STORE_PATH);
+  } catch {
+    // Memory is best-effort (esp. per-warm-instance /tmp on Vercel). Never let
+    // a store write take down a chat turn.
+  }
 }
 
 /** Build a stable-ish server-side fingerprint from request + client id. */
