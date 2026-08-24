@@ -328,24 +328,32 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
+            {/* Suggestion quick-replies — rendered as a chat message so they feel
+                like part of the conversation, not a detached toolbar. */}
+            {showSuggestions && (
+              <div className="flex flex-col items-start gap-2">
+                <div
+                  className="max-w-[85%] rounded-2xl rounded-tl-sm px-3 py-2 text-sm"
+                  style={{ background: 'var(--dim)', border: '1px solid var(--mid)', color: 'var(--ash)' }}
+                >
+                  Quick start — tap one, or type your own:
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => sendText(s)}
+                      className="rounded-full border px-3 py-1.5 text-xs transition-transform hover:scale-105"
+                      style={{ background: 'var(--dim)', borderColor: 'var(--gold)', color: 'var(--bonelight, var(--bone))' }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div ref={endRef} />
           </div>
-
-          {/* Suggestion chips — tap to send. Shown on a fresh conversation. */}
-          {showSuggestions && (
-            <div className="flex flex-wrap gap-2 px-4 pb-3" style={{ background: 'var(--ink)' }}>
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => sendText(s)}
-                  className="rounded-full border px-3 py-1.5 text-xs transition-transform hover:scale-105"
-                  style={{ background: 'var(--dim)', borderColor: 'var(--gold)', color: 'var(--bonelight, var(--bone))' }}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
 
           {error && (
             <div className="px-4 pb-1" style={{ color: '#e58' }}>
@@ -353,15 +361,26 @@ export default function Chatbot() {
             </div>
           )}
 
-          {/* Input */}
-          <form onSubmit={handleSend} className="flex items-center gap-2 border-t px-3 py-3" style={{ borderColor: 'var(--mid)', background: 'var(--dim)' }}>
-            <input
+          {/* Input — auto-growing textarea; Enter sends, Shift+Enter/newline. */}
+          <form onSubmit={handleSend} className="flex items-end gap-2 border-t px-3 py-3" style={{ borderColor: 'var(--mid)', background: 'var(--dim)' }}>
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={done ? 'Thanks, talk soon.' : 'Type a message...'}
               disabled={done}
-              className="min-w-0 flex-1 rounded-full bg-transparent px-3 py-2 text-sm outline-none"
-              style={{ background: 'var(--ink)', color: 'var(--bone)', border: '1px solid var(--mid)' }}
+              rows={1}
+              className="min-w-0 flex-1 resize-none rounded-2xl bg-transparent px-3 py-2 text-sm outline-none"
+              style={{
+                background: 'var(--ink)',
+                color: 'var(--bone)',
+                border: '1px solid var(--mid)',
+                maxHeight: '120px',
+              }}
+              onInput={(e) => {
+                const el = e.currentTarget;
+                el.style.height = 'auto';
+                el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -373,7 +392,7 @@ export default function Chatbot() {
               type="submit"
               disabled={done || thinking || !input.trim()}
               aria-label="Send"
-              className="flex h-9 w-9 items-center justify-center rounded-full transition-transform disabled:opacity-40"
+              className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center self-end rounded-full transition-transform disabled:opacity-40"
               style={{ background: 'var(--gold)', color: 'var(--ink)' }}
             >
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
